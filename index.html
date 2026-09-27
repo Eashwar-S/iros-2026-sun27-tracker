@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>IROS 2026 Sun Sep 27 — Eashwar Networking Tracker</title>
+<style>
+:root {
+  --bg: #0f1419;
+  --bg2: #1a2332;
+  --bg3: #243044;
+  --card: #1e2a3a;
+  --border: #2d3f56;
+  --text: #e8eef4;
+  --muted: #8b9cb3;
+  --accent: #3b9eff;
+  --accent2: #5eead4;
+  --warn: #fbbf24;
+  --danger: #f87171;
+  --ok: #34d399;
+  --skip: #94a3b8;
+  --attend: #34d399;
+  --radius: 12px;
+  --shadow: 0 4px 20px rgba(0,0,0,.35);
+}
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #f4f7fb; --bg2: #fff; --bg3: #e8eef6; --card: #fff;
+    --border: #c5d0de; --text: #1a2332; --muted: #5a6b80;
+    --shadow: 0 4px 16px rgba(0,0,0,.08);
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.5;
+  padding-bottom: 4rem;
+}
+a { color: var(--accent); }
+header {
+  background: linear-gradient(135deg, #0c4a6e 0%, #134e4a 100%);
+  padding: 1.25rem 1rem 1.5rem; position: sticky; top: 0; z-index: 50;
+  box-shadow: var(--shadow);
+}
+header h1 { margin: 0 0 .4rem; font-size: 1.25rem; }
+.banner {
+  background: var(--warn); color: #1a1a1a; font-weight: 700;
+  padding: .55rem 1rem; text-align: center; font-size: .95rem;
+}
+.sub { color: rgba(255,255,255,.85); font-size: .9rem; margin: 0; }
+nav {
+  display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .85rem;
+}
+nav a {
+  background: rgba(255,255,255,.12); color: #fff; text-decoration: none;
+  padding: .35rem .7rem; border-radius: 999px; font-size: .8rem;
+}
+nav a:hover { background: rgba(255,255,255,.22); }
+main { max-width: 960px; margin: 0 auto; padding: 1rem; }
+section { margin: 1.75rem 0; }
+h2 {
+  font-size: 1.15rem; border-bottom: 2px solid var(--accent);
+  padding-bottom: .35rem; margin: 0 0 1rem;
+}
+h3 { font-size: 1rem; margin: 1rem 0 .5rem; color: var(--accent2); }
+.card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1rem; margin-bottom: .75rem;
+  box-shadow: var(--shadow);
+}
+.card.skip-card { opacity: .72; border-style: dashed; }
+.badge {
+  display: inline-block; font-size: .7rem; font-weight: 700;
+  padding: .15rem .45rem; border-radius: 4px; margin-right: .25rem;
+  text-transform: uppercase; letter-spacing: .03em;
+}
+.badge.attend { background: #065f46; color: #a7f3d0; }
+.badge.skip { background: #374151; color: #d1d5db; }
+.badge.verified { background: #1e3a5f; color: #93c5fd; }
+.badge.unverified { background: #78350f; color: #fde68a; }
+.badge.tag { background: var(--bg3); color: var(--accent2); font-weight: 600; }
+.badge.rank { background: #4c1d95; color: #ddd6fe; }
+.meta { color: var(--muted); font-size: .85rem; }
+.timeline { position: relative; padding-left: 1.25rem; }
+.timeline::before {
+  content: ""; position: absolute; left: .35rem; top: .25rem; bottom: .25rem;
+  width: 3px; background: var(--border); border-radius: 2px;
+}
+.t-item {
+  position: relative; margin-bottom: .85rem; padding: .75rem 1rem;
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+}
+.t-item::before {
+  content: ""; position: absolute; left: -1.05rem; top: 1.1rem;
+  width: 10px; height: 10px; border-radius: 50%; background: var(--accent);
+  border: 2px solid var(--bg);
+}
+.t-item.must::before { background: var(--ok); }
+.t-item.keep::before { background: var(--accent2); }
+.t-item.optional::before { background: var(--warn); }
+.t-item.drain::before { background: var(--danger); }
+.t-time { font-weight: 700; color: var(--accent); font-size: .9rem; }
+.check-row {
+  display: flex; flex-wrap: wrap; gap: .6rem 1rem; margin-top: .6rem;
+  font-size: .85rem;
+}
+.check-row label { display: flex; align-items: center; gap: .35rem; cursor: pointer; }
+textarea {
+  width: 100%; margin-top: .5rem; min-height: 56px; resize: vertical;
+  background: var(--bg); color: var(--text); border: 1px solid var(--border);
+  border-radius: 8px; padding: .5rem; font-family: inherit; font-size: .85rem;
+}
+.opener {
+  background: var(--bg3); border-left: 3px solid var(--accent2);
+  padding: .6rem .75rem; margin: .5rem 0; border-radius: 0 8px 8px 0;
+  font-size: .9rem;
+}
+.btn {
+  display: inline-block; background: var(--accent); color: #fff; border: none;
+  padding: .65rem 1.1rem; border-radius: 8px; font-weight: 700; cursor: pointer;
+  font-size: .95rem; margin: .35rem .35rem .35rem 0;
+}
+.btn:hover { filter: brightness(1.1); }
+.btn.secondary { background: var(--bg3); color: var(--text); border: 1px solid var(--border); }
+#followup-out {
+  white-space: pre-wrap; background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1rem; font-size: .85rem;
+  max-height: 480px; overflow: auto; margin-top: .75rem; display: none;
+}
+.grid2 { display: grid; gap: .75rem; }
+@media (min-width: 640px) { .grid2 { grid-template-columns: 1fr 1fr; } }
+.note-box {
+  background: var(--bg3); border-radius: 8px; padding: .75rem; font-size: .9rem;
+  margin: .5rem 0 1rem;
+}
+ul.compact { margin: .4rem 0; padding-left: 1.2rem; }
+ul.compact li { margin: .25rem 0; }
+.conflict { color: var(--warn); font-weight: 600; }
+footer { text-align: center; color: var(--muted); font-size: .8rem; padding: 2rem 1rem; }
+</style>
+</head>
+<body>
+
+<div class="banner">⚠ Workshops are SUNDAY Sep 27, 2026 — NOT Monday Sep 28. (Workshops: Sun Sep 27 &amp; Thu Oct 1 only.)</div>
+
+<header>
+  <h1>IROS 2026 · Sun Sep 27 Networking Tracker</h1>
+  <p class="sub">Eashwar Sathyamurthy · UMD PhD · multi-robot routing / energy·failure · auction replanning · SAGE · Crossfire · self-improving swarms + local world models</p>
+  <p class="sub">Career lens: balanced postdoc + industry · Openers = curiosity/collaboration only (never say “postdoc”)</p>
+  <nav>
+    <a href="#plan">Day plan</a>
+    <a href="#workshops">Workshops</a>
+    <a href="#speakers">Speakers</a>
+    <a href="#meet">Priority meet</a>
+    <a href="#followup">Follow-up</a>
+  </nav>
+</header>
+
+<main>
+
+<!-- ========== DAY PLAN ========== -->
+<section id="plan">
+  <h2>Recommended day sequence (locked plan)</h2>
+  <div class="note-box">
+    <strong>Locked:</strong> AM <em>FM-MRS Rooms 301/302 MUST</em> · PM <em>Hybrid Embodied Autonomy Rooms 303/304 KEEP early / SKIP late if drained</em>.
+    <span class="conflict">WORLDS is also 301/302 PM — conflicts with Hybrid; prefer Hybrid unless energy is high and world-models flips priority.</span>
+  </div>
+  <div class="timeline">
+    <div class="t-item must">
+      <div class="t-time">Before 8:50</div>
+      <strong>Badge + coffee → seat in 301/302</strong>
+      <div class="meta">Arrive early; Tokekar orbit / FM-MRS organizers may be near doors.</div>
+    </div>
+    <div class="t-item must">
+      <div class="t-time">8:30 – 12:30 · Rooms 301/302</div>
+      <strong>ATTEND full — FM-MRS (Foundation Models in Multi-Robot Systems)</strong>
+      <ul class="compact">
+        <li>8:40 Fan (MIT) · 9:05 Hsieh (Penn) · 9:30 Alonso-Mora (TU Delft)</li>
+        <li>9:55 lightning · <strong>10:15–11:15 coffee + posters = primary networking block</strong></li>
+        <li>11:15 Jiachen Li (GT) · 11:35 Agaskar (Amazon) · panel</li>
+      </ul>
+    </div>
+    <div class="t-item keep">
+      <div class="t-time">10:15 – 11:15</div>
+      <strong>Poster networking targets</strong>
+      <div class="meta">Auction / LLM coordination / verified agentic planning / Sukhatme–Kumar paper #5 · PIP-LLM (Shi) · TriPlane-WAM · NeuroMesh</div>
+    </div>
+    <div class="t-item keep">
+      <div class="t-time">~12:30 – 13:30</div>
+      <strong>Lunch transition → Hybrid Rooms 303/304</strong>
+      <div class="meta">Grab Tokekar / Fan / Hsieh if not caught at coffee. Do not linger into WORLDS 301/302 unless flipping plan.</div>
+    </div>
+    <div class="t-item keep">
+      <div class="t-time">13:00/13:30 – ~15:30 · Rooms 303/304</div>
+      <strong>KEEP early Hybrid — Bridging Learning, Planning &amp; Control</strong>
+      <ul class="compact">
+        <li>Posa ~14:30 “data-control sandwich” — high priority</li>
+        <li>Other Hybrid speakers TBD on public schedule; catch Chalvatzaki / Ravichandar / Heng Yang if present early</li>
+      </ul>
+    </div>
+    <div class="t-item optional">
+      <div class="t-time">PM conflict note</div>
+      <strong>WORLDS (301/302, 13:30–17:40)</strong> — Kaelbling, Dantu, Gupta, Fragkiadaki, Ogata.
+      <div class="meta conflict">Skip unless energy high + world-models priority flips. RoBoWoMo Room 406 is full-day alt for neural/symbolic WM — only if AM plan already broken.</div>
+    </div>
+    <div class="t-item drain">
+      <div class="t-time">Late PM if drained — skip order</div>
+      <ol class="compact">
+        <li>Skip Hybrid after ~15:30 (before Figueroa 16:00) if already met Posa + 1–2 others</li>
+        <li>Skip Figueroa ~16:00 if drained (still valuable collab angle — only skip if truly spent)</li>
+        <li>Skip WORLDS late talks / RoBoWoMo panels entirely</li>
+        <li>Use leftover energy for hallway + one follow-up coffee, not a third workshop</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ========== WORKSHOPS ========== -->
+<section id="workshops">
+  <h2>Workshop list</h2>
+  <p class="meta">Verified = HTTP 200 on a non-Google dedicated site (checked via curl). Google Sites and missing github.io listed separately as Unverified even if 200.</p>
+
+  <h3>Verified links (HTTP 200)</h3>
+  <div class="card">
+    <span class="badge verified">Verified</span> <span class="badge attend">ATTEND AM</span>
+    <strong>FM-MRS — Foundation Models in Multi-Robot Systems</strong><br/>
+    <span class="meta">Sun Sep 27 · 8:30–12:30 · Rooms 301 &amp; 302</span><br/>
+    <a href="https://zhourobotics.github.io/fm-mrs/" target="_blank" rel="noopener">zhourobotics.github.io/fm-mrs</a>
+    <div class="meta">Organizers include Pratap Tokekar (UMD), Vijay Kumar, Jiachen Li, et al.</div>
+  </div>
+  <div class="card">
+    <span class="badge verified">Verified</span> <span class="badge attend">KEEP PM early</span>
+    <strong>WORLDS — World Models &amp; Spatial Intelligence for Physical AI</strong><br/>
+    <span class="meta">Sun Sep 27 · 13:30–17:40 · Rooms 301/302 (conflicts with Hybrid)</span><br/>
+    <a href="https://worlds-iros2026.github.io/" target="_blank" rel="noopener">worlds-iros2026.github.io</a>
+    <div class="meta conflict">Secondary to Hybrid under locked plan.</div>
+  </div>
+  <div class="card">
+    <span class="badge verified">Verified</span> <span class="badge skip">Alt / Room 406</span>
+    <strong>RoBoWoMo — Neural &amp; Symbolic World Models</strong><br/>
+    <span class="meta">Sun Sep 27 · Full day · Room 406</span><br/>
+    <a href="https://worldmodelworkshop.github.io/" target="_blank" rel="noopener">worldmodelworkshop.github.io</a>
+  </div>
+  <div class="card">
+    <span class="badge verified">Verified</span> <span class="badge skip">AM conflict w/ FM-MRS</span>
+    <strong>ReS AI — Embodied Neuro-Symbolic AI for Reliable &amp; Safe Robotics</strong><br/>
+    <span class="meta">Sun Sep 27 · Morning half-day</span><br/>
+    <a href="https://embodied-nesy.github.io/" target="_blank" rel="noopener">embodied-nesy.github.io</a>
+  </div>
+  <div class="card">
+    <span class="badge verified">Verified</span> <span class="badge skip">NOT Sunday — Thu Oct 1</span>
+    <strong>Physical World Models for Scaling Embodied AI (PWMS)</strong><br/>
+    <span class="meta">Thursday Oct 1 · 13:30–17:30 — listed for link completeness only</span><br/>
+    <a href="https://physical-world-models.github.io/IROS2026/" target="_blank" rel="noopener">physical-world-models.github.io/IROS2026</a>
+  </div>
+
+  <h3>Unverified / Google Sites / no public github.io</h3>
+  <div class="card skip-card">
+    <span class="badge unverified">Unverified</span> <span class="badge attend">KEEP PM early</span>
+    <strong>Hybrid Architectures for Embodied Autonomy (BLPC)</strong><br/>
+    <span class="meta">Sun Sep 27 · ~13:00–17:30 · Rooms 303/304 · No dedicated github.io found (404 on common patterns). Google Sites <code>sites.google.com/view/blpc-iros2026</code> returned sign-in wall. Speaker times from GRASP public page.</span><br/>
+    <span class="meta">OpenReview: IEEE.org/IROS/2026/Workshop/BLPC · Official IROS workshops listing</span>
+  </div>
+  <div class="card skip-card">
+    <span class="badge unverified">Unverified (Google)</span>
+    <strong>MASBW @ MTU</strong><br/>
+    <span class="meta">HTTP 200 but Google Sites — treat as Unverified per tracker rules</span><br/>
+    <span class="meta">sites.google.com/mtu.edu/masbw-iros26/home</span>
+  </div>
+  <div class="card skip-card">
+    <span class="badge unverified">Unverified (Google)</span>
+    <strong>2nd Heterogeneous MRS / Real-World Multi-Robot Cooperation</strong><br/>
+    <span class="meta">HTTP 200 but Google Sites · AM half-day (conflicts with FM-MRS)</span><br/>
+    <span class="meta">sites.google.com/view/iros2026-2nd-wrwcmrc/home · Hsieh also speaks here ~11:10 (you’ll be in FM-MRS)</span>
+  </div>
+</section>
+
+<!-- ========== SPEAKERS ========== -->
+<section id="speakers">
+  <h2>Speaker cards</h2>
+  <p class="meta">Summaries use known public lines of work — not invented paper titles. Tags · postdoc-fit rank (1=highest research-fit) · ATTEND/SKIP for your day.</p>
+
+  <!-- FM-MRS -->
+  <h3>FM-MRS (ATTEND)</h3>
+
+  <div class="card" data-id="fan">
+    <span class="badge attend">ATTEND</span> <span class="badge rank">Rank 2</span>
+    <span class="badge tag">multi-agent</span> <span class="badge tag">embodied</span>
+    <strong>Chuchu Fan — MIT</strong>
+    <div class="meta">8:40–9:05 · LLMs/VLMs + formal reasoning for planning</div>
+    <p>Known for bringing formal methods / verification together with learning-based control and planning (safe autonomy, neural certificates). Talk angle: can foundation models plan rigorously when paired with formal tools — maps to your auction replanning under failure and energy constraints.</p>
+    <div class="check-row">
+      <label><input type="checkbox" data-k="attended"> Attended</label>
+      <label><input type="checkbox" data-k="met"> Met</label>
+      <label><input type="checkbox" data-k="contact"> Got contact</label>
+      <label><input type="checkbox" data-k="follow"> Follow-up needed</label>
+    </div>
+    <textarea data-k="notes" placeholder="Notes…"></textarea>
+  </div>
+
+  <div class="card" data-id="hsieh">
+    <span class="badge attend">ATTEND</span> <span class="badge rank">Rank 1</span>
+    <span class="badge tag">swarm</span> <span class="badge tag">multi-agent</span> <span class="badge tag">world-models</span>
+    <strong>M. Ani Hsieh — Penn (GRASP)</strong>
+    <div class="meta">9:05–9:30 · Physics foundation models for multi-robot autonomy</div>
+    <p>Known for multi-robot coordination, environmental monitoring, and physics-informed / distributed autonomy for robot teams. Strongest swarm + energy/failure fit of the AM lineup; also appears on Heterogeneous MRS later (you stay in FM-MRS).</p>
+    <div class="check-row">
+      <label><input type="checkbox" data-k="attended"> Attended</label>
+      <label><input type="checkbox" data-k="met"> Met</label>
+      <label><input type="checkbox" data-k="contact"> Got contact</label>
+      <label><input type="checkbox" data-k="follow"> Follow-up needed</label>
+    </div>
+    <textarea data-k="notes" placeholder="Notes…"></textarea>
+  </div>
+
+  <div class="card" data-id="alonso">
+    <span class="badge attend">ATTEND</span> <span class="badge rank">Rank 3</span>
+    <span class="badge tag">multi-agent</span> <span class="badge tag">embodied</span>
+    <strong>Javier Alonso-Mora — TU Delft</strong>
+    <div class="meta">9:30–9:55 · Foundation models for planner adaptation &amp; open-world perception</div>
+    <p>Known for multi-robot motion planning, interactive navigation, and learning-augmented planners for robot teams in shared spaces. Planner adaptation under open-world perception connects to your replanning under non-nominal conditions.</p>
+    <div class="check-row">
+      <label><input type="checkbox" data-k="attended"> Attended</label>
+      <label><input type="checkbox" data-k="met"> Met</label>
+      <label><input type="checkbox" data-k="contact"> Got contact</label>
+      <label><input type="checkbox" data-k="follow"> Follow-up needed</label>
+    </div>
+    <textarea data-k="notes" placeholder="Notes…"></textarea>
+  </div>
+
+  <div class="card" data-id="jiachen">
+    <span class="badge attend">ATTEND</span> <span class="badge rank">Rank 2</span>
+    <span class="badge tag">multi-agent</span> <span class="badge tag">embodied</span> <span class="badge tag">swarm</span>
+    <strong>Jiachen Li — Georgia Tech</strong>
+    <div class="meta">11:15–11:35 · Safe &amp; efficient coordination for cooperative embodied agents · also FM-MRS organizer</div>
+    <p>Known for multi-agent learning, interaction-aware prediction, and safe coordination of embodied agents. Direct overlap with cooperative teams and safety under uncertainty in your routing / wildfire UAV work.</p>
+    <div class="check-row">
+      <label><input type="checkbox" data-k="attended"> Attended</label>
+      <label><input type="checkbox" data-k="met"> Met</label>
+      <label><input type="checkbox" data-k="contact"> Got contact</label>
+      <label><input type="checkbox" data-k="follow"> Follow-up needed</label>
+    </div>
+    <textarea data-k="notes" placeholder="Notes…"></textarea>
+  </div>
+
+  <div class="card" data-id="agaskar">
+    <span class="badge attend">ATTEND</span> <span class="badge rank">Rank 5</span>
+    <span class="badge tag">multi-agent</span> <span class="badge tag">swarm</span>
+    <strong>Ameya Agaskar — Amazon Robotics</strong>
+    <div class="meta">11:35–11:55 · DEEPFLEET: multi-agent foundation models for mobile robots</div>
+    <p>Industry fleet-scale multi-agent foundation models (DEEPFLEET line). High value for the industry side of a balanced career path; ask about real deployment constraints vs. academic MRS assumptions.</p>
+    <div class="check-row">
+      <label><input type="checkbox" data-k="attended"> Attended</label>
+      <label><input type="checkbox" data-k="met"> Met</label>
+      <label><input type="checkbox" data-k="contact"> Got contact</label>
+      <label><input type="checkbox" data-k="follow"> Follow-up needed</label>
+    </div>
+    <textarea data-k="notes" placeholder="Notes…"></textarea>
+  </div>
+
+  <div class="card" data-id="tokekar">
+    <span class="badge attend">ATTEND</span> <span class="badge rank">Rank 1</span>
+    <span class="badge tag">multi-agent</span> <span class="badge tag">swarm</span>
+    <strong>Pratap Tokekar — UMD (organizer)</strong>
+    <div class="meta">FM-MRS organizer · likely advisor-orbit presence all AM</div>
+    <p>Known for multi-robot planning, active sensing, and field robotics (including aerial teams). Natural home-base contact; use for intros to Fan/Hsieh/Kumar orbit rather than a cold research pitch.</p>
+    <div class="check-row">
+      <label><input type="checkbox" data-k="attended"> Attended</label>
+      <label><input type="checkbox" data-k="met"> Met</label>
+      <label><input type="checkbox" data-k="contact"> Got contact</label>
+      <label><input type="checkbox" data-k="follow"> Follow-up needed</label>
+    </div>
+    <textarea data-k="notes" placeholder="Notes…"></textarea>
+  </div>
+
+  <div class="card" data-id="kumar-sukhatme">
+    <span class="badge attend">ATTEND poster</span> <span class="badge rank">Rank 4</span>
+    <span class="badge tag">multi-agent</span>
+    <strong>Vijay Kumar / Gaurav Sukhatme orbit (accepted FM-MRS paper)</strong>
+    <div class="meta">Poster: “Multi-Robot Formation Coordination with Verified Agentic LLM Planning” (Zhang, Wu, Shi, Diller, Sukhatme, Kumar)</div>
+    <p>Kumar known for aerial swarm robotics and GRASP leadership; Sukhatme for multi-robot systems and field autonomy. Verified agentic LLM planning is a concrete bridge to your auction / SAGE metareasoning interests — meet authors at 10:15 poster block.</p>
+    <div class="check-row">
+      <label><input type="checkbox" data-k="attended"> Attended</label>
+      <label><input type="checkbox" data-k="met"> Met</label>
+      <label><input type="checkbox" data-k="contact"> Got contact</label>
+      <label><input type="checkbox" data-k="follow"> Follow-up needed</label>
+    </div>
+    <textarea data-k="notes" placeholder="Notes…"></textarea>
+  </div>
+
+  <!-- Hybrid -->
+  <h3>Hybrid Embodied Autonomy (KEEP early / SKIP late if drained)</h3>
+
+  <div class="card" data-id="posa">
+    <span class="badge attend">ATTEND</span> <span class="badge rank">Rank 1</span>
+    <span class="badge tag">embodied</span> <span class="badge tag">world-models</span>
+    <strong>Michael Posa — Penn</strong>
+    <div class="meta">~14:30–15:00 · “The data-control sandwich: towards pretty-good robots that work all the time” (GRASP)</div>
+    <p>Known for contact-rich dynamics, complementarity / hybrid dynamical systems, and combining model-based control with learning so robots remain reliable under contact. Core Hybrid talk for your “local models + replanning” agenda.</p>
+    <div class="check-row">
+      <label><input type="checkbox" data-k="attended"> Attended</label>
+      <label><input type="checkbox" data-k="met"> Met</label>
+      <label><input type="checkbox" data-k="contact"> Got contact</label>
+      <label><input type="checkbox" data-k="follow"> Follow-up needed</label>
+    </div>
+    <textarea data-k="notes" placeholder="Notes…"></textarea>
+  </div>
+
+  <div class="card" data-id="figueroa">
+    <span class="badge attend">KEEP if energy</span> <span class="badge rank">Rank 3</span>
+    <span class="badge tag">embodied</span> <span class="badge tag">multi-agent</span>
+    <strong>Nadia Figueroa — Penn</strong>
+    <div class="meta">~16:00–16:30 (GRASP) · title TBD on public pages</div>
+    <p>Known for learning from demonstration, interactive / collaborative manipulation, and reactive motion generation for human–robot settings. Strong embodied collab angle; first to cut if drained after Posa.</p>
+    <div class="check-row">
+      <label><input type="checkbox" data-k="attended"> Attended</label>
+      <label><input type="checkbox" data-k="met"> Met</label>
+      <label><input type="checkbox" data-k="contact"> Got contact</label>
+      <label><input type="checkbox" data-k="follow"> Follow-up needed</label>
+    </div>
+    <textarea data-k="notes" placeholder="Notes…"></textarea>
+  </div>
+
+  <div class="card" data-id="chalvatzaki">
+    <span class="badge attend">ATTEND if early</span> <span class="badge rank">Rank 4</span>
+    <span class="badge tag">embodied</span> <span class="badge tag">world-models</span>
+    <strong>Georgia Chalvatzaki — TU Darmstadt</strong>
+    <div class="meta">Talk time TBD (public Hybrid schedule incomplete)</div>
+    <p>Known for robot learning for mobile manipulation, assistive robotics, and combining learning with structured planning/control. Fit for hybrid autonomy architectures; confirm time on-site.</p>
+    <div class="check-row">
+      <label><input type="checkbox" data-k="attended"> Attended</label>
+      <label><input type="checkbox" data-k="met"> Met</label>
+      <label><input type="checkbox" data-k="contact"> Got contact</label>
+      <label><input type="checkbox" data-k="follow"> Follow-up needed</label>
+    </div>
+    <textarea data-k="notes" placeholder="Notes…"></textarea>
+  </div>
+
+  <div class="card" data-id="ravichandar">
+    <span class="badge attend">ATTEND if early</span> <span class="badge rank">Rank 2</span>
+    <span class="badge tag">multi-agent</span> <span class="badge tag">swarm</span> <span class="badge tag">embodied</span>
+    <strong>Harish Ravichandar — Georgia Tech</strong>
+    <div class="meta">Talk time TBD · also listed among Hybrid community/organizing orbit in public posts</div>
+    <p>Known for multi-robot learning, coordination, and robot learning for collaborative teams. High overlap with auction-style allocation and team coordination under uncertainty.</p>
+    <div class="check-row">
+      <label><input type="checkbox" data-k="attended"> Attended</label>
+      <label><input type="checkbox" data-k="met"> Met</label>
+      <label><input type="checkbox" data-k="contact"> Got contact</label>
+      <label><input type="checkbox" data-k="follow"> Follow-up needed</label>
+    </div>
+    <textarea data-k="notes" placeholder="Notes…"></textarea>
+  </div>
+
+  <div class="card" data-id="hengyang">
+    <span class="badge attend">ATTEND if early</span> <span class="badge rank">Rank 4</span>
+    <span class="badge tag">embodied</span>
+    <strong>Heng Yang — Harvard</strong>
+    <div class="meta">Talk time TBD</div>
+    <p>Known for optimization, certifiable perception, and tight coupling of learning with geometric / control structure. Relevant to “pretty-good robots that work” reliability themes alongside Posa.</p>
+    <div class="check-row">
+      <label><input type="checkbox" data-k="attended"> Attended</label>
+      <label><input type="checkbox" data-k="met"> Met</label>
+      <label><input type="checkbox" data-k="contact"> Got contact</label>
+      <label><input type="checkbox" data-k="follow"> Follow-up needed</label>
+    </div>
+    <textarea data-k="notes" placeholder="Notes…"></textarea>
+  </div>
+
+  <!-- WORLDS (conflict) -->
+  <h3>WORLDS PM (conflict — SKIP unless flip)</h3>
+
+  <div class="card skip-card" data-id="kaelbling">
+    <span class="badge skip">SKIP default</span> <span class="badge rank">Rank 2 if flip</span>
+    <span class="badge tag">world-models</span> <span class="badge tag">embodied</span>
+    <strong>Leslie Pack Kaelbling — MIT</strong>
+    <div class="meta">13:35–14:00 · “Small Models for Big Worlds”</div>
+    <p>Known for integrated learning and planning for robots, belief-space planning, and long-horizon task-level autonomy. Excellent world-models fit if you flip away from Hybrid.</p>
+    <div class="check-row">
+      <label><input type="checkbox" data-k="attended"> Attended</label>
+      <label><input type="checkbox" data-k="met"> Met</label>
+      <label><input type="checkbox" data-k="contact"> Got contact</label>
+      <label><input type="checkbox" data-k="follow"> Follow-up needed</label>
+    </div>
+    <textarea data-k="notes" placeholder="Notes…"></textarea>
+  </div>
+
+  <div class="card skip-card" data-id="dantu">
+    <span class="badge skip">SKIP default</span> <span class="badge rank">Rank 5</span>
+    <span class="badge tag">world-models</span> <span class="badge tag">embodied</span>
+    <strong>Karthik Dantu — University at Buffalo</strong>
+    <div class="meta">14:25–14:50 · “GoLF: Graphs over Lagrangian Fields”</div>
+    <p>Known for perception and spatial representation for robot autonomy (CAREER, embodied autonomy center). Secondary unless representation learning is the day’s priority.</p>
+    <div class="check-row">
+      <label><input type="checkbox" data-k="attended"> Attended</label>
+      <label><input type="checkbox" data-k="met"> Met</label>
+      <label><input type="checkbox" data-k="contact"> Got contact</label>
+      <label><input type="checkbox" data-k="follow"> Follow-up needed</label>
+    </div>
+    <textarea data-k="notes" placeholder="Notes…"></textarea>
+  </div>
+
+  <div class="card skip-card" data-id="gupta">
+    <span class="badge skip">SKIP default</span> <span class="badge rank">Rank 3 if flip</span>
+    <span class="badge tag">world-models</span> <span class="badge tag">embodied</span>
+    <strong>Abhishek Gupta — University of Washington</strong>
+    <div class="meta">16:15–16:40 · “World models beyond next frame prediction”</div>
+    <p>Known for scalable robot reinforcement learning and real-world continual adaptation (WEIRD lab). Relevant to self-improving agents if you stay late in WORLDS.</p>
+    <div class="check-row">
+      <label><input type="checkbox" data-k="attended"> Attended</label>
+      <label><input type="checkbox" data-k="met"> Met</label>
+      <label><input type="checkbox" data-k="contact"> Got contact</label>
+      <label><input type="checkbox" data-k="follow"> Follow-up needed</label>
+    </div>
+    <textarea data-k="notes" placeholder="Notes…"></textarea>
+  </div>
+
+  <div class="card skip-card" data-id="fragkiadaki">
+    <span class="badge skip">SKIP default</span> <span class="badge rank">Rank 4</span>
+    <span class="badge tag">world-models</span>
+    <strong>Katerina Fragkiadaki — CMU</strong>
+    <div class="meta">16:40–17:05 · “3D Foundational Model for Robot Perception and Imagination”</div>
+    <p>Known for few-shot / continual learning for perception, action, and language grounding. Strong perception–imagination WM line; late slot under default Hybrid plan.</p>
+    <div class="check-row">
+      <label><input type="checkbox" data-k="attended"> Attended</label>
+      <label><input type="checkbox" data-k="met"> Met</label>
+      <label><input type="checkbox" data-k="contact"> Got contact</label>
+      <label><input type="checkbox" data-k="follow"> Follow-up needed</label>
+    </div>
+    <textarea data-k="notes" placeholder="Notes…"></textarea>
+  </div>
+
+  <div class="card skip-card" data-id="ogata">
+    <span class="badge skip">SKIP default</span> <span class="badge rank">Rank 5</span>
+    <span class="badge tag">world-models</span> <span class="badge tag">embodied</span>
+    <strong>Tetsuya Ogata — Waseda</strong>
+    <div class="meta">17:05–17:30 · Robot foundation models from cognitive robotics</div>
+    <p>Known for cognitive developmental robotics, VLA-style models, and human–robot interaction. Lowest priority under locked Hybrid plan (end of day).</p>
+    <div class="check-row">
+      <label><input type="checkbox" data-k="attended"> Attended</label>
+      <label><input type="checkbox" data-k="met"> Met</label>
+      <label><input type="checkbox" data-k="contact"> Got contact</label>
+      <label><input type="checkbox" data-k="follow"> Follow-up needed</label>
+    </div>
+    <textarea data-k="notes" placeholder="Notes…"></textarea>
+  </div>
+</section>
+
+<!-- ========== PRIORITY MEET ========== -->
+<section id="meet">
+  <h2>Who-to-meet priority (~top 8) + 15-sec openers</h2>
+  <p class="meta">Openers frame research curiosity / possible collaboration — never mention postdoc, job search, or “looking for positions.”</p>
+
+  <div class="card">
+    <strong>1. M. Ani Hsieh</strong> <span class="badge rank">#1</span>
+    <div class="opener">“Loved the physics-foundation-models framing for team sensing and safe motion — I’m working on multi-robot routing under energy and failure with auction-style replanning; curious how you’d couple a local physics prior with discrete team replans when robots drop out.”</div>
+  </div>
+  <div class="card">
+    <strong>2. Michael Posa</strong> <span class="badge rank">#2</span>
+    <div class="opener">“The data-control sandwich idea clicked for me — we care about self-improving UAV teams that keep a local world model and replan under failures. Where do you see the ‘control bun’ helping most when the learned filling is a short-horizon team world model rather than a single-robot policy?”</div>
+  </div>
+  <div class="card">
+    <strong>3. Chuchu Fan</strong> <span class="badge rank">#3</span>
+    <div class="opener">“Your formal-reasoning + LLM/VLM planning talk is close to something we’re wrestling with: language or auction bids as mission specs, but with hard energy and failure constraints. What’s the cleanest interface you’ve seen between a foundation-model proposer and a verifier that still runs at team scale?”</div>
+  </div>
+  <div class="card">
+    <strong>4. Jiachen Li</strong> <span class="badge rank">#4</span>
+    <div class="opener">“Really interested in safe coordination for cooperative embodied agents — we run multi-UAV wildfire scenarios where coordination has to stay safe under sparse comms. Would love to compare notes on what ‘safe enough’ means when agents replan asynchronously.”</div>
+  </div>
+  <div class="card">
+    <strong>5. Javier Alonso-Mora</strong> <span class="badge rank">#5</span>
+    <div class="opener">“Your planner-adaptation + open-world perception angle maps to our auction replanning when the yard or fire front goes non-nominal. How do you decide when to adapt the planner versus re-perceive and freeze the plan structure?”</div>
+  </div>
+  <div class="card">
+    <strong>6. Nadia Figueroa</strong> <span class="badge rank">#6</span>
+    <div class="opener">“I’m exploring how reactive / learned motion layers coexist with discrete team replanners. Curious whether your interactive control work suggests keeping the continuous layer local on each robot while a symbolic or auction layer only renegotiates goals.”</div>
+  </div>
+  <div class="card">
+    <strong>7. Pratap Tokekar</strong> <span class="badge rank">#7</span>
+    <div class="opener">“Thanks for organizing FM-MRS — the poster block is packed. If you have 30 seconds, who here would you point me to for verified LLM planning or physics priors in MRS? I’m chasing self-improving swarms with local world models.”</div>
+  </div>
+  <div class="card">
+    <strong>8. Harish Ravichandar</strong> <span class="badge rank">#8</span>
+    <div class="opener">“I’ve been following your multi-robot learning / coordination line — we’re looking at metareasoning over auctions when teammates fail. Curious which hybrid learning–planning interfaces have actually held up when team size or heterogeneity grows.”</div>
+  </div>
+
+  <div class="note-box">
+    <strong>Poster-block bonus:</strong> Zhang/Wu/Shi/Diller + Sukhatme/Kumar paper on verified agentic LLM formation coordination — opener: “Your verified agentic LLM planning for formations is close to our auction + constraint-check stack; how brittle is the verifier when bids or LLM proposals are noisy?”
+  </div>
+</section>
+
+<!-- ========== FOLLOW-UP ========== -->
+<section id="followup">
+  <h2>End-of-day follow-up generator</h2>
+  <p class="meta">Builds a copyable summary from checked contacts + DRAFT-only email templates. Nothing sends automatically.</p>
+  <button type="button" class="btn" id="btn-gen">Generate follow-up list</button>
+  <button type="button" class="btn secondary" id="btn-copy">Copy to clipboard</button>
+  <button type="button" class="btn secondary" id="btn-clear">Clear saved checkboxes/notes</button>
+  <pre id="followup-out"></pre>
+</section>
+
+</main>
+
+<footer>
+  Local-only tracker · state in localStorage key <code>iros-sun27-eashwar-v1</code> · IROS 2026 Sunday Sep 27 (not Mon 28)
+</footer>
+
+<script>
+(function () {
+  const STORAGE = 'iros-sun27-eashwar-v1';
+  const people = {
+    fan: { name: 'Chuchu Fan', affil: 'MIT', talk: 'LLMs/VLMs + formal reasoning for planning (FM-MRS 8:40)', angle: 'foundation-model proposer + verifier at team scale; energy/failure constraints in auction replanning' },
+    hsieh: { name: 'M. Ani Hsieh', affil: 'Penn', talk: 'Physics foundation models for multi-robot autonomy (FM-MRS 9:05)', angle: 'physics priors for team sensing/safe motion coupled with discrete replans under dropout' },
+    alonso: { name: 'Javier Alonso-Mora', affil: 'TU Delft', talk: 'Foundation models for planner adaptation & open-world perception (FM-MRS 9:30)', angle: 'when to adapt the planner vs re-perceive under non-nominal conditions' },
+    jiachen: { name: 'Jiachen Li', affil: 'Georgia Tech', talk: 'Safe coordination for cooperative embodied agents (FM-MRS 11:15)', angle: 'safe async coordination under sparse comms in multi-UAV wildfire scenarios' },
+    agaskar: { name: 'Ameya Agaskar', affil: 'Amazon Robotics', talk: 'DEEPFLEET multi-agent FMs (FM-MRS 11:35)', angle: 'fleet-scale deployment constraints vs academic MRS assumptions' },
+    tokekar: { name: 'Pratap Tokekar', affil: 'UMD', talk: 'FM-MRS organizer', angle: 'intros toward verified LLM planning / physics priors in MRS; self-improving swarms' },
+    'kumar-sukhatme': { name: 'Kumar/Sukhatme orbit (Zhang et al.)', affil: 'Penn / USC et al.', talk: 'Verified agentic LLM formation coordination poster', angle: 'verifier brittleness when LLM/auction proposals are noisy' },
+    posa: { name: 'Michael Posa', affil: 'Penn', talk: 'Data-control sandwich (~14:30 Hybrid)', angle: 'control layer helping when learned piece is a short-horizon team world model' },
+    figueroa: { name: 'Nadia Figueroa', affil: 'Penn', talk: 'Hybrid invited (~16:00)', angle: 'reactive continuous layer local vs auction/symbolic goal renegotiation' },
+    chalvatzaki: { name: 'Georgia Chalvatzaki', affil: 'TU Darmstadt', talk: 'Hybrid invited (time TBD)', angle: 'hybrid learning–planning for mobile manipulation / structured control' },
+    ravichandar: { name: 'Harish Ravichandar', affil: 'Georgia Tech', talk: 'Hybrid (time TBD)', angle: 'metareasoning over auctions as team size/heterogeneity grows' },
+    hengyang: { name: 'Heng Yang', affil: 'Harvard', talk: 'Hybrid (time TBD)', angle: 'certifiable / optimization structure with learned components for reliability' },
+    kaelbling: { name: 'Leslie Pack Kaelbling', affil: 'MIT', talk: 'Small Models for Big Worlds (WORLDS)', angle: 'small structured models for large worlds; long-horizon team planning' },
+    dantu: { name: 'Karthik Dantu', affil: 'UB', talk: 'GoLF (WORLDS)', angle: 'graph/spatial representations for autonomy' },
+    gupta: { name: 'Abhishek Gupta', affil: 'UW', talk: 'World models beyond next-frame (WORLDS)', angle: 'self-improving agents and continual real-world adaptation' },
+    fragkiadaki: { name: 'Katerina Fragkiadaki', affil: 'CMU', talk: '3D foundational model perception/imagination (WORLDS)', angle: 'perception–imagination world models for embodied teams' },
+    ogata: { name: 'Tetsuya Ogata', affil: 'Waseda', talk: 'Cognitive robotics foundation models (WORLDS)', angle: 'cognitive robotics view on robot FMs' }
+  };
+
+  function load() {
+    try { return JSON.parse(localStorage.getItem(STORAGE) || '{}'); }
+    catch (e) { return {}; }
+  }
+  function save(state) {
+    localStorage.setItem(STORAGE, JSON.stringify(state));
+  }
+
+  function hydrate() {
+    const state = load();
+    document.querySelectorAll('.card[data-id]').forEach(card => {
+      const id = card.dataset.id;
+      const s = state[id] || {};
+      card.querySelectorAll('input[type=checkbox]').forEach(cb => {
+        cb.checked = !!s[cb.dataset.k];
+        cb.addEventListener('change', persist);
+      });
+      const ta = card.querySelector('textarea');
+      if (ta) {
+        ta.value = s.notes || '';
+        ta.addEventListener('input', persist);
+      }
+    });
+  }
+
+  function persist() {
+    const state = load();
+    document.querySelectorAll('.card[data-id]').forEach(card => {
+      const id = card.dataset.id;
+      const entry = {};
+      card.querySelectorAll('input[type=checkbox]').forEach(cb => {
+        entry[cb.dataset.k] = cb.checked;
+      });
+      const ta = card.querySelector('textarea');
+      entry.notes = ta ? ta.value : '';
+      state[id] = entry;
+    });
+    save(state);
+  }
+
+  function draftEmail(p, notes) {
+    return [
+      `DRAFT ONLY — do not auto-send`,
+      `To: ${p.name} <find email on workshop site / OpenReview / institution page>`,
+      `Subject: Nice meeting you at IROS 2026 (Sun workshops) — ${p.talk.split('(')[0].trim()}`,
+      ``,
+      `Dear Prof./Dr. ${p.name.split(' ').slice(-1)[0]},`,
+      ``,
+      `It was a pleasure meeting you at IROS 2026 after your talk on ${p.talk}. I'm Eashwar Sathyamurthy, a PhD student at UMD working on multi-robot routing under energy and failure constraints, auction-based replanning, and self-improving UAV teams with local world models (including wildfire scenarios).`,
+      ``,
+      `I especially wanted to follow up on ${p.angle}. ${notes ? 'Notes from our chat: ' + notes.trim() : 'I would value any pointers to related ongoing work or students/collaborators thinking along similar lines.'}`,
+      ``,
+      `No ask beyond staying in touch if useful — happy to share a short summary of our Crossfire / SAGE-related directions if helpful.`,
+      ``,
+      `Best regards,`,
+      `Eashwar Sathyamurthy`,
+      `University of Maryland`,
+      ``
+    ].join('\n');
+  }
+
+  document.getElementById('btn-gen').addEventListener('click', () => {
+    persist();
+    const state = load();
+    const lines = [];
+    lines.push('=== IROS 2026 Sun Sep 27 — Follow-up list (DRAFT ONLY) ===');
+    lines.push('Generated locally — nothing was sent.');
+    lines.push('');
+    let n = 0;
+    Object.keys(people).forEach(id => {
+      const s = state[id] || {};
+      if (s.met || s.contact || s.follow) {
+        n++;
+        const p = people[id];
+        lines.push(`--- ${n}. ${p.name} (${p.affil}) ---`);
+        lines.push(`Talk: ${p.talk}`);
+        lines.push(`Flags: met=${!!s.met} contact=${!!s.contact} follow-up=${!!s.follow} attended=${!!s.attended}`);
+        if (s.notes) lines.push(`Notes: ${s.notes}`);
+        lines.push('');
+        lines.push(draftEmail(p, s.notes || ''));
+        lines.push('');
+      }
+    });
+    if (n === 0) {
+      lines.push('No contacts flagged yet. Check Met / Got contact / Follow-up needed on speaker cards.');
+    } else {
+      lines.push(`Total flagged contacts: ${n}`);
+    }
+    const out = document.getElementById('followup-out');
+    out.style.display = 'block';
+    out.textContent = lines.join('\n');
+  });
+
+  document.getElementById('btn-copy').addEventListener('click', async () => {
+    const out = document.getElementById('followup-out');
+    if (!out.textContent) {
+      document.getElementById('btn-gen').click();
+    }
+    try {
+      await navigator.clipboard.writeText(out.textContent);
+      alert('Copied follow-up list to clipboard.');
+    } catch (e) {
+      out.focus();
+      const r = document.createRange();
+      r.selectNodeContents(out);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(r);
+      alert('Select-all applied — copy manually (Ctrl/Cmd+C).');
+    }
+  });
+
+  document.getElementById('btn-clear').addEventListener('click', () => {
+    if (!confirm('Clear all saved checkboxes and notes for this tracker?')) return;
+    localStorage.removeItem(STORAGE);
+    document.querySelectorAll('.card[data-id] input[type=checkbox]').forEach(cb => { cb.checked = false; });
+    document.querySelectorAll('.card[data-id] textarea').forEach(ta => { ta.value = ''; });
+    document.getElementById('followup-out').style.display = 'none';
+    document.getElementById('followup-out').textContent = '';
+  });
+
+  hydrate();
+})();
+</script>
+</body>
+</html>
